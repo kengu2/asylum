@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import calendar
-
 import datetime
-
 import importlib
 import random
 
@@ -39,3 +37,18 @@ def add_months(sourcedate, months):
     month = month % 12 + 1
     day = min(sourcedate.day, calendar.monthrange(year, month)[1])
     return datetime.datetime(year, month, day)
+
+# Adapted from http://www.ianlewis.org/en/python-date-range-iterator
+def months(from_date=None, to_date=None):
+    from_date = from_date or datetime.datetime.now().date()
+    while to_date is None or from_date <= to_date:
+        yield from_date
+        from_date = from_date + datetime.timedelta(days=calendar.monthrange(from_date.year, from_date.month)[1])
+    return
+
+
+def datetime_proxy(delta=datetime.timedelta(days=1)):
+    """Used by management commands needing datetime X days ago"""
+    now_yesterday = datetime.datetime.now() - delta
+    start_yesterday = datetime.datetime.combine(now_yesterday.date(), datetime.datetime.min.time())
+    return start_yesterday.isoformat()
